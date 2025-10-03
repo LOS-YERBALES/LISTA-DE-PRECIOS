@@ -99,12 +99,12 @@
       background-color: #25D366;
       color: white;
       border-radius: 50%;
-      width: 100px;
-      height: 100px;
+      width: 70px;
+      height: 70px;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 30px;
+      font-size: 50px;
       text-decoration: none;
       box-shadow: 0 4px 6px rgba(0,0,0,0.3);
       z-index: 1000;
@@ -115,16 +115,17 @@
       transform: scale(1.1);
     }
 
-    /* Responsivo para pantallas más pequeñas */
-    @media (max-width: 600px) {
-      .whatsapp-button {
-        width: 50px;
-        height: 50px;
-        font-size: 25px;
-        bottom: 15px;
-        right: 15px;
-      }
-    }
+/* Responsivo para pantallas más pequeñas */
+@media (max-width: 1000px) {
+  .whatsapp-button {
+    width: 160px;
+    height: 160px;
+    font-size: 120px;   /* ícono más grande */
+    bottom: 15px;
+    right: 15px;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -257,4 +258,5 @@
 
 </body>
 </html>
+
 
