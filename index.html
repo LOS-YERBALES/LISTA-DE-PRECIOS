@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de Precios - Los Yerbales</title>
+  <!-- Font Awesome para íconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .custom-banner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: url("banner.png") no-repeat center center;
+      background-size: cover;
+      color: #d4af37;
+      padding: 20px;
+      height: 200px;
+      width: 100%;
+      text-shadow: 2px 2px 4px #000;
+    }
+
+    .custom-banner h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    /* Franja marrón con datos de contacto */
+    .contact-bar {
+      background: #d4af37; /* marrón */
+      color: black;
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      width: 100%;
+    }
+
+    .contact-bar i {
+      margin: 0 5px;
+      color: #013220;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    h1 {
+      margin-top: 40px;
+      color: #013220;
+      text-align: center;
+    }
+
+    h3 {
+      text-align: center;
+    }
+
+    .filtros {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    select {
+      padding: 5px 10px;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    th {
+      background: #d4af37;
+      color: #013220;
+    }
+
+    /* Botón WhatsApp flotante */
+    .whatsapp-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #25D366;
+      color: white;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 30px;
+      text-decoration: none;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      z-index: 1000;
+      transition: transform 0.2s;
+    }
+
+    .whatsapp-button:hover {
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Banner -->
+  <div class="custom-banner"></div>
+
+  <!-- Franja marrón con datos -->
+  <div class="contact-bar">
+    ELSA NOEMI PAZ DE OLIVERA - 
+    <i class="fab fa-whatsapp"></i> +54 9 11 2634-1630 - 
+    <i class="fas fa-home"></i> Mariano Castex 3489, Canning, Buenos Aires - 
+    IVA RESPONSABLE INSCRIPTO
+  </div>
+
+  <div class="container">
+    <h3>Vigencia de precios: 28/06/2025 - Hasta: 15/10/2025</h3>
+
+    <!-- Filtros -->
+    <div class="filtros">
+      <label for="filtroPresentacion"><b>Filtrar por Presentación:</b></label>
+      <select id="filtroPresentacion">
+        <option value="">-- Todas --</option>
+      </select>
+    </div>
+
+    <!-- Tabla Única -->
+    <h1>LOS YERBALES - LISTA DE PRECIOS</h1>
+    <table id="tablaProductos">
+      <thead>
+        <tr>
+          <th>COD EAN 13</th>
+          <th>PRESENTACION</th>
+          <th>PRODUCTO</th>
+          <th>MON</th>
+          <th>PRECIO ARRANQUE</th>
+          <th>DESCUENTO FACTURA (%)</th>
+          <th>NETO FACTURA</th>
+          <th>PRECIO NETO UN</th>
+          <th>PRECIO NETO KG</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Botón WhatsApp flotante -->
+  <a href="https://wa.me/5491126341630" target="_blank" class="whatsapp-button">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+<script>
+  let productos = [];
+
+  // Convertir CSV en objetos
+  function parseCSV(text) {
+    const lines = text.trim().split("\n");
+    const headers = lines[0].split(",");
+    return lines.slice(1).map(line => {
+      const values = line.split(",");
+      let obj = {};
+      headers.forEach((h, i) => obj[h.trim()] = values[i] ? values[i].trim() : "");
+      return obj;
+    });
+  }
+
+  // Formatear números como moneda
+  function formatCurrency(value) {
+    if (!value || isNaN(value)) return value;
+    return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(parseFloat(value));
+  }
+
+  // Renderizar fila
+  function renderFila(item) {
+    return `
+      <tr>
+        <td>${item["COD EAN 13"]}</td>
+        <td>${item["PRESENTACION"]}</td>
+        <td>${item["Producto"]}</td>
+        <td>${item["Mon"]}</td>
+        <td>${formatCurrency(item["Precio Arranque"])}</td>
+        <td>${item["Descuento Factura %"] || "-"}</td>
+        <td>${formatCurrency(item["Neto Factura"])}</td>
+        <td>${formatCurrency(item["Precio Neto UN"])}</td>
+        <td>${formatCurrency(item["Precio Neto KG"])}</td>
+      </tr>`;
+  }
+
+  // Renderizar tabla según filtro
+  function renderTabla(filtro = "") {
+    const tbody = document.querySelector("#tablaProductos tbody");
+    tbody.innerHTML = "";
+
+    productos
+      .filter(item => !filtro || item["PRESENTACION"] === filtro)
+      .forEach(item => {
+        tbody.innerHTML += renderFila(item);
+      });
+  }
+
+  // Cargar CSV en la tabla única
+  async function cargarCSV(url) {
+    const resp = await fetch(url);
+    const text = await resp.text();
+    productos = parseCSV(text);
+
+    // Llenar opciones del select
+    const presentaciones = [...new Set(productos.map(p => p["PRESENTACION"]))].sort();
+    const filtroSelect = document.getElementById("filtroPresentacion");
+
+    presentaciones.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p;
+      opt.textContent = p;
+      filtroSelect.appendChild(opt);
+    });
+
+    // Evento de filtro
+    filtroSelect.addEventListener("change", e => {
+      renderTabla(e.target.value);
+    });
+
+    // Render inicial
+    renderTabla();
+  }
+
+  // Ejecutar
+  cargarCSV("productos.csv");
+</script>
+
+</body>
+</html>
